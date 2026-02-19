@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIoT Marine Robotics — AI Technology Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030d14;
+    --bg2: #061824;
+    --surface: #0a2030;
+    --surface2: #0f2d42;
+    --accent: #00e5ff;
+    --accent2: #00ff9d;
+    --accent3: #7b61ff;
+    --accent4: #ff6b35;
+    --accent5: #ffd166;
+    --text: #cce8f4;
+    --text-dim: #5a8fa8;
+    --border: rgba(0,229,255,0.12);
+    --glow: rgba(0,229,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Animated ocean background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 80%, rgba(0,100,150,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,60,120,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(0,229,255,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Floating particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    animation: float-up linear infinite;
+  }
+
+  @keyframes float-up {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.1; }
+    100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+  }
+
+  /* Noise texture overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  .wrapper { position: relative; z-index: 2; }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-inner { max-width: 900px; }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    background: rgba(0,229,255,0.05);
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    animation: fadeInDown 0.8s 0.1s ease both;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    animation: fadeInDown 0.8s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    animation: fadeInDown 0.8s 0.3s ease both;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 0.4rem;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: fadeIn 1s 1s ease both;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  /* ===== SECTION LAYOUT ===== */
+  .section {
+    padding: 5rem 2rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    opacity: 0.6;
+    min-width: 3rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .section-title .accent { color: var(--accent); }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* ===== AI CATEGORY CARDS ===== */
+  .ai-category {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    background: rgba(10,32,48,0.6);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .ai-category:hover {
+    border-color: rgba(0,229,255,0.3);
+    box-shadow: 0 0 40px rgba(0,229,255,0.05), inset 0 0 40px rgba(0,229,255,0.02);
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  .cat-header::after {
+    content: '+';
+    position: absolute;
+    right: 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    color: var(--accent);
+    transition: transform 0.3s;
+  }
+
+  .ai-category.open .cat-header::after {
+    transform: rotate(45deg);
+  }
+
+  .cat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .cat-meta { flex: 1; }
+
+  .cat-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.2rem;
+  }
+
+  .cat-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+
+  .cat-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.15);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    margin-right: 2.5rem;
+  }
+
+  .cat-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .ai-category.open .cat-body { display: block; }
+
+  /* ===== AI TECH ITEMS ===== */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .tech-item {
+    background: var(--bg);
+    padding: 1.8rem 2rem;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tech-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--item-color, var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tech-item:hover::before { opacity: 1; }
+  .tech-item:hover { background: rgba(0,229,255,0.03); }
+
+  .tech-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .tech-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    border: 1px solid;
+    flex-shrink: 0;
+  }
+
+  .badge-model { color: var(--accent2); border-color: rgba(0,255,157,0.3); background: rgba(0,255,157,0.06); }
+  .badge-method { color: var(--accent3); border-color: rgba(123,97,255,0.3); background: rgba(123,97,255,0.06); }
+  .badge-arch { color: var(--accent); border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.06); }
+  .badge-emerging { color: var(--accent4); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.06); }
+  .badge-framework { color: var(--accent5); border-color: rgba(255,209,102,0.3); background: rgba(255,209,102,0.06); }
+
+  .tech-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 0.8rem;
+  }
+
+  .tech-why {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    line-height: 1.6;
+    padding: 0.6rem 0.8rem;
+    border-left: 2px solid var(--item-color, var(--accent));
+    background: rgba(0,229,255,0.04);
+    color: #7ecfea;
+  }
+
+  .tech-why strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ===== PIPELINE DIAGRAM ===== */
+  .pipeline {
+    margin: 4rem 0;
+    padding: 3rem 2rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pipeline::before {
+    content: 'AI DATA PIPELINE';
+    position: absolute;
+    top: 1.5rem; right: 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  .pipeline-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: var(--accent);
+  }
+
+  .pipeline-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+
+  .pipe-stage {
+    flex-shrink: 0;
+    min-width: 160px;
+    padding: 1.2rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    text-align: center;
+  }
+
+  .pipe-stage + .pipe-stage {
+    border-left: none;
+  }
+
+  .pipe-stage::after {
+    content: '→';
+    position: absolute;
+    right: -0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 1rem;
+    z-index: 2;
+    background: var(--bg2);
+    padding: 0 2px;
+  }
+
+  .pipe-stage:last-child::after { display: none; }
+
+  .pipe-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .pipe-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+  .pipe-models {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--accent);
+    line-height: 1.8;
+    text-align: left;
+  }
+
+  /* ===== CHALLENGE-AI MATRIX ===== */
+  .matrix {
+    margin: 3rem 0;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    min-width: 700px;
+  }
+
+  thead th {
+    background: var(--surface);
+    padding: 0.8rem 1.2rem;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(0,229,255,0.06);
+    transition: background 0.2s;
+  }
+
+  tbody tr:hover { background: rgba(0,229,255,0.04); }
+
+  tbody td {
+    padding: 0.9rem 1.2rem;
+    color: var(--text-dim);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  tbody td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .challenge-badge {
+    display: inline-block;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.2);
+    color: var(--accent4);
+    padding: 0.1rem 0.5rem;
+    border-radius: 2px;
+    font-size: 0.65rem;
+    margin-right: 0.3rem;
+  }
+
+  .solution-highlight {
+    color: var(--accent2);
+  }
+
+  /* ===== MODEL ZOO GRID ===== */
+  .model-zoo {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .model-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem;
+    background: var(--surface);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .model-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-color, var(--accent));
+  }
+
+  .model-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border-color: rgba(0,229,255,0.25);
+  }
+
+  .model-card-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .model-card-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+
+  .model-card-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent), transparent);
+    opacity: 0.2;
+    margin: 2rem 0;
+  }
+
+  /* ===== COLOR THEMES PER CATEGORY ===== */
+  .cat-cv { --cat-color: #00e5ff; }
+  .cat-perception { --cat-color: #00ff9d; }
+  .cat-slam { --cat-color: #7b61ff; }
+  .cat-biology { --cat-color: #ff6b35; }
+  .cat-prediction { --cat-color: #ffd166; }
+  .cat-edge { --cat-color: #f72585; }
+  .cat-comms { --cat-color: #4cc9f0; }
+  .cat-rl { --cat-color: #b5e48c; }
+  .cat-physics { --cat-color: #cdb4db; }
+  .cat-mlops { --cat-color: #f4a261; }
+
+  .cat-cv .cat-icon { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+  .cat-perception .cat-icon { background: rgba(0,255,157,0.1); border: 1px solid rgba(0,255,157,0.2); }
+  .cat-slam .cat-icon { background: rgba(123,97,255,0.1); border: 1px solid rgba(123,97,255,0.2); }
+  .cat-biology .cat-icon { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); }
+  .cat-prediction .cat-icon { background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.2); }
+  .cat-edge .cat-icon { background: rgba(247,37,133,0.1); border: 1px solid rgba(247,37,133,0.2); }
+  .cat-comms .cat-icon { background: rgba(76,201,240,0.1); border: 1px solid rgba(76,201,240,0.2); }
+  .cat-rl .cat-icon { background: rgba(181,228,140,0.1); border: 1px solid rgba(181,228,140,0.2); }
+  .cat-physics .cat-icon { background: rgba(205,180,219,0.1); border: 1px solid rgba(205,180,219,0.2); }
+  .cat-mlops .cat-icon { background: rgba(244,162,97,0.1); border: 1px solid rgba(244,162,97,0.2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  @media (max-width: 768px) {
+    .tech-grid { grid-template-columns: 1fr; }
+    .hero-stats { gap: 2rem; }
+    .pipe-stage { min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">Complete AI Technology Reference</div>
+      <h1>AI Stack for<br><span>Underwater Marine</span><br>Robotics & Reef AI</h1>
+      <p class="hero-sub">Every AI model, method, architecture, and framework needed to build autonomous underwater intelligence — from raw turbid pixels to reef-scale ecosystem understanding.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">10</span>
+          <span class="stat-label">AI Domains</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">60+</span>
+          <span class="stat-label">AI Models & Methods</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">∞</span>
+          <span class="stat-label">Ocean Depth</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      Explore
+    </div>
+  </section>
+
+  <!-- AI PIPELINE -->
+  <div class="section reveal">
+    <div class="pipeline">
+      <div class="pipeline-title">End-to-End AI Perception & Decision Pipeline</div>
+      <div class="pipeline-flow">
+        <div class="pipe-stage">
+          <div class="pipe-icon">📷</div>
+          <div class="pipe-label">Raw Sensor Input</div>
+          <div class="pipe-models">Camera / Sonar<br>Hydrophone<br>CTD / eDNA</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">🌊</div>
+          <div class="pipe-label">Physics Correction</div>
+          <div class="pipe-models">FUnIE-GAN<br>UIEC²-Net<br>Dark Channel</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">👁️</div>
+          <div class="pipe-label">Perception AI</div>
+          <div class="pipe-models">YOLOv9 / RT-DETR<br>SegFormer<br>SAM 2</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">🗺️</div>
+          <div class="pipe-label">SLAM / Mapping</div>
+          <div class="pipe-models">ORB-SLAM3<br>NeRF / 3DGS<br>DVL Fusion</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">🧬</div>
+          <div class="pipe-label">Species & Health AI</div>
+          <div class="pipe-models">EfficientNet<br>BioFounder<br>eDNA LLMs</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">📈</div>
+          <div class="pipe-label">Forecasting</div>
+          <div class="pipe-models">PatchTST<br>TFT<br>Ocean PINNs</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">🤖</div>
+          <div class="pipe-label">RL Autonomy</div>
+          <div class="pipe-models">PPO / SAC<br>MARL<br>Sim-to-Real</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-icon">☁️</div>
+          <div class="pipe-label">Cloud & Digital Twin</div>
+          <div class="pipe-models">Federated Learning<br>MLOps<br>Cesium / NeRF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AI CATEGORIES -->
+  <div class="section">
+    <div class="section-header reveal">
+      <span class="section-number">01</span>
+      <h2 class="section-title"><span class="accent">AI</span> Technology Deep Dive</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <!-- 1. COMPUTER VISION -->
+    <div class="ai-category cat-cv open reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">👁️</div>
+        <div class="cat-meta">
+          <div class="cat-name">Computer Vision & Image Understanding</div>
+          <div class="cat-sub">Detection · Segmentation · 3D Reconstruction · Video Understanding</div>
+        </div>
+        <span class="cat-count">12 models</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">YOLOv9 / RT-DETR <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">State-of-the-art real-time object detection architecture. YOLOv9 uses Programmable Gradient Information (PGI) to reduce information bottleneck during training. RT-DETR uses a transformer-based detection head with hybrid encoder for high accuracy without NMS.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Real-time fish species detection, coral colony counting, debris identification at 30–60 FPS on Jetson Orin. Fine-tune on underwater datasets like Fish4Knowledge, DeepFish, or custom annotated reef imagery.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">Segment Anything Model 2 (SAM 2) <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Meta's foundation model for zero-shot segmentation across images and video. Uses a hierarchical image encoder (Hiera), streaming memory for video tracking, and prompt-based interaction. Can segment any object from a single click or box.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Segment individual coral colonies, fish, and benthic substrate patches in video transects without per-class training. Enables rapid annotation of novel species with minimal labeling effort.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">SegFormer / Mask2Former <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">Transformer-based semantic and panoptic segmentation. SegFormer uses hierarchical Mix Transformer (MiT) encoders without positional encodings, making it robust to input size changes. Mask2Former uses masked attention for universal segmentation.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Pixel-perfect reef substrate classification: live coral, bleached coral, turf algae, crustose coralline algae (CCA), rubble, and bare rock — all in a single forward pass.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">Depth Anything V2 / MiDaS <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Monocular depth estimation models trained on massive unlabeled datasets. Depth Anything V2 leverages synthetic data with precise annotations plus real data for robust generalization. MiDaS uses multi-scale vision transformers with multi-dataset mixing.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Recover metric scale from a single camera for fish length measurement, coral height estimation, and terrain-relative navigation without requiring stereo cameras or laser rangers.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">Neural Radiance Fields (NeRF) / 3D Gaussian Splatting <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">NeRF represents scenes as continuous volumetric functions learned by an MLP from multi-view images. 3D Gaussian Splatting (3DGS) uses explicit 3D Gaussians for real-time rendering. Both produce photo-realistic, geometrically accurate 3D reconstructions.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Reconstruct measurable 3D reef models from AUV video fly-throughs. Monitor coral growth morphology over months. 3DGS enables real-time visualization in digital twin dashboards.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">ByteTrack / DeepSORT / StrongSORT <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Multi-object tracking algorithms that associate detections across frames. ByteTrack uses all detection boxes (not just high-confidence) via IoU-based association. StrongSORT integrates appearance features (ReID embeddings) with motion models for robust re-ID.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Track individual fish through video for abundance estimation, behavioral analysis, and schooling dynamics. Re-identify sharks or turtles across multiple AUV passes for population counts.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">Grounding DINO / OWL-ViT <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Open-vocabulary object detection models that use language descriptions rather than fixed class lists. Grounding DINO combines a DINO visual backbone with a BERT text encoder for phrase-grounded detection. OWL-ViT uses CLIP embeddings for zero-shot detection.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Enable marine biologists to query video with natural language: "find bleached Acropora coral" or "locate fish near cleaning stations" without retraining the model for each new species or behavior.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">Video Swin Transformer / VideoMAE <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">Spatiotemporal transformers for video understanding. Video Swin uses 3D shifted window attention for efficient local-global modeling. VideoMAE applies masked autoencoding to video for self-supervised pretraining with 90%+ token masking ratio.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Behavioral classification — spawning events, predator-prey interactions, fish feeding patterns — from AUV video without per-frame annotations. Pretrain on large unlabeled reef footage before fine-tuning.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00e5ff">
+            <div class="tech-name">DINOv2 / EVA-CLIP <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Large self-supervised vision foundation models. DINOv2 uses self-distillation with no labels to learn universal visual features with outstanding linear probe performance. EVA-CLIP scales CLIP training with EVA-style weight initialization for billion-parameter vision encoders.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Extract rich visual features for few-shot coral species classification. Even with only 5–10 labeled examples of a rare species, DINOv2 features enable competitive classification — critical for biodiversity monitoring.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. UNDERWATER PERCEPTION -->
+    <div class="ai-category cat-perception reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">🌊</div>
+        <div class="cat-meta">
+          <div class="cat-name">Physics-Aware Underwater Perception AI</div>
+          <div class="cat-sub">Image Enhancement · Turbidity Correction · Acoustic AI · Hyperspectral</div>
+        </div>
+        <span class="cat-count">8 models</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">FUnIE-GAN / UIEC²-Net <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">GAN-based underwater image enhancement architectures. FUnIE-GAN (Fast Underwater Image Enhancement) uses a conditional GAN with a paired loss function combining perceptual, global, local, and structural losses. UIEC²-Net enhances using RGB-HSV parallel channels with global/local adaptive attention.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Correct color cast (loss of red at depth), blue-green haze, backscatter, and low contrast before feeding frames into detection/segmentation models. Critical for reliable CV in turbid, shallow reef or eutrophic aquaculture water.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">UIE-WD / WaterNet / Shallow-UWNet <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Physics-model-informed underwater enhancement networks. WaterNet uses a gated fusion network to adaptively blend white-balance, histogram equalization, and gamma-corrected inputs. UIE-WD decouples water body type estimation from image enhancement.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Handle different water types (tropical clear blue, coastal turbid green, estuarine brown) automatically. Deploy a single model across diverse reef sites without manual parameter tuning per location.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">Acoustic Image CNN / Sonar PointNet++ <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">CNNs adapted for forward-looking sonar (FLS) and side-scan sonar imagery. Sonar images have fundamentally different noise characteristics (speckle, shadow artifacts, multipath) requiring custom architectures. PointNet++ handles raw acoustic point clouds from multibeam sonar.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Detect obstacles in zero-visibility water, classify seafloor substrate from side-scan imagery, and identify coral structural complexity from multibeam point clouds — all without optical visibility.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">Bioacoustic CNN / BirdNET-Marine <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Convolutional networks operating on mel-spectrogram representations of hydrophone recordings. Architecture mirrors audio classification models (ResNet or EfficientNet on spectrograms) but trained on marine soundscape datasets including fish calls, snapping shrimp, and cetacean vocalizations.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Reef health index from passive acoustics — healthy reefs are noisy. Fish spawning aggregation detection. Species richness estimation from sound without visual observation. Continuous 24/7 monitoring from fixed hydrophone buoys.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">Hyperspectral CNN + Anomaly Detection <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Deep learning pipelines for hyperspectral image cubes (100–400 spectral bands). 3D CNNs or spectral-spatial attention networks extract features jointly across spatial and spectral dimensions. Autoencoder-based anomaly detection flags spectral signatures deviating from baseline.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Detect coral bleaching 2–3 weeks before visible whitening by detecting changes in zooxanthellae fluorescence spectra. Identify harmful algal bloom species from chlorophyll-a absorption peaks. Map benthic habitat types invisible to RGB.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #00ff9d">
+            <div class="tech-name">Deformable Convolutional Networks (DCN) for Caustic Robustness <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">Deformable convolutions learn spatially-adaptive receptive fields that are geometrically invariant to surface wave caustic patterns. Unlike standard convolutions with fixed grid sampling, DCN offsets sampling locations based on learned feature maps.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Caustic light patterns from ocean surface waves create flickering, distorted textures on the seafloor that confuse standard CNNs. DCN-based backbones maintain consistent coral texture recognition regardless of illumination patterns.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SLAM & NAVIGATION AI -->
+    <div class="ai-category cat-slam reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">🗺️</div>
+        <div class="cat-meta">
+          <div class="cat-name">AI-Driven SLAM, Localization & Navigation</div>
+          <div class="cat-sub">Neural SLAM · Visual Odometry · Terrain Navigation · Path Planning</div>
+        </div>
+        <span class="cat-count">8 methods</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">ORB-SLAM3 + Deep Feature Replacement <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">ORB-SLAM3 is a complete multi-map visual-inertial SLAM system. For underwater use, ORB features (sensitive to turbidity) are replaced with learned keypoint detectors (SuperPoint) and descriptors (SuperGlue / LightGlue) that are robust to haze and low contrast.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Build consistent 3D maps of reef corridors without GPS. SuperPoint+LightGlue feature matching maintains loop closure under 60%+ visibility degradation versus classical ORB. Critical for AUV reef survey repeatability.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">SuperPoint / SuperGlue / LightGlue <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">SuperPoint is a self-supervised keypoint detector/descriptor trained on homographic adaptations of natural images. SuperGlue is an attentional graph neural network for feature matching. LightGlue is a lighter, faster successor with adaptive computation depth.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Robust feature matching between AUV frames in turbid, low-texture environments where traditional SIFT/ORB fail entirely. Essential for photogrammetric 3D reef reconstruction from multiple passes.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">iNeRF / NeRF-based Localization <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Using a pre-built NeRF scene model as a localization prior. iNeRF inverts NeRF rendering to estimate camera pose by optimizing pose to minimize the difference between rendered and observed images. Enables highly accurate relocalization against a reference map.</div>
+            <div class="tech-why"><strong>Marine use:</strong> AUV returns to a previously mapped reef site and localizes precisely within a NeRF-built reference model — enabling centimeter-accurate repeated measurements of coral growth over restoration timescales.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">Neural A* / Transformer Path Planning <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Neural A* replaces the heuristic function in A* with a learned guidance network that predicts search guidance from map features. Transformer-based planners frame path planning as sequence modeling — learning from demonstration trajectories.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Plan energy-optimal survey trajectories through complex 3D reef terrain, avoiding overhangs and swim-throughs. Learn from expert pilot trajectories to navigate tight coral channels that rule-based planners fail at.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">Gaussian Process Occupancy Mapping <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Bayesian non-parametric approach representing occupancy as a GP over 3D space, providing probabilistic uncertainty estimates rather than binary occupied/free. Continuous representation avoids resolution limitations of voxel grids.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Build probabilistic 3D maps of reef structure from sparse sonar measurements. Uncertainty maps guide AUV re-observation to reduce localization uncertainty in poorly observed reef zones.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #7b61ff">
+            <div class="tech-name">Kalman Filter / EKF / UKF + IMU Fusion <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Bayesian state estimation frameworks. Extended Kalman Filter (EKF) linearizes nonlinear motion models for real-time fusion of IMU, DVL, depth sensor, and camera odometry. Unscented KF (UKF) uses sigma points for better handling of strong nonlinearities.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Core of AUV navigation stack — fuses 100Hz IMU data with 5Hz DVL velocity, 1Hz depth, and 10Hz visual odometry into a consistent high-rate pose estimate for stable hovering and survey grid execution.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. MARINE BIOLOGY AI -->
+    <div class="ai-category cat-biology reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">🪸</div>
+        <div class="cat-meta">
+          <div class="cat-name">Marine Biology & Species AI</div>
+          <div class="cat-sub">Species ID · Health Assessment · eDNA · Coral Classification · Biomass</div>
+        </div>
+        <span class="cat-count">9 models</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">EfficientNetV2 / ConvNeXt Fine-tuned for Species ID <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">High-accuracy image classification backbones. EfficientNetV2 uses progressive learning with mixed training strategies. ConvNeXt modernizes the ResNet architecture with transformer-inspired design choices. Both achieve top-tier ImageNet accuracy with lower compute than ViTs.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Coral genus/species classification across 100+ coral taxa. Fish species ID across 1000+ reef species from still frames. Train on FishBase imagery, CoralNet annotations, or iNaturalist marine observations with transfer learning.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Bioclip / iNat Foundation Model <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">CLIP-style models pretrained specifically on biodiversity datasets (iNaturalist, GBIF, EOL). BioCLIP aligns images with taxonomic hierarchy text (kingdom → species) using a specialized tree-of-life encoder. Achieves dramatically better few-shot species classification than generic CLIP.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Zero-shot or few-shot ID of rare or newly discovered reef species that don't appear in training data. Generate embeddings of coral imagery to search for similar morphologies across survey archives without retraining.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Coral Health Index CNN (Bleaching Classifier) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Multi-label classification network scoring coral health across bleaching stages (healthy → pale → partially bleached → fully bleached → recently dead → old dead). Ordinal regression loss functions preserve the natural ordering of health states better than softmax.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Automate CoralNet point-count methodology. Survey 1000 coral colonies per AUV transect with consistent, bias-free health scoring. Track bleaching onset and recovery at individual colony level across mass bleaching events.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Transformer for eDNA Species Identification <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">DNA sequence transformers (DNABERT, Nucleotide Transformer) pretrained on genomic sequences using masked language modeling adapted to the 4-base DNA alphabet. Fine-tuned on metabarcoding amplicons (12S rRNA, COI) for species-level taxonomic assignment from eDNA samples.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Identify every fish, coral, and invertebrate species present from a single water sample. 1 liter of seawater contains enough eDNA to detect 50–200 species. Pair with AUV-mounted eDNA samplers for non-invasive reef biodiversity assessment.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Stereo Vision + CNNs for Fish Biomass Estimation <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Combines stereo depth reconstruction to get metric 3D coordinates of fish with CNN-based pose estimation and landmark detection. Length-weight allometric relationships then convert body measurements to biomass. Keypoint detection (HRNet or ViTPose) localizes anatomical landmarks.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Non-invasive fish length/weight estimation for fisheries stock assessment and aquaculture biomass monitoring. Replace destructive sampling with continuous, automated video-based measurement at sub-centimeter accuracy.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Graph Neural Networks for Coral Connectivity <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">GNNs model reef structure as a spatial graph where nodes are coral colonies and edges encode proximity, species interactions, and genetic connectivity. Graph attention networks (GAT) learn which colony relationships most predict community stability and recovery.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Identify keystone coral colonies whose removal or bleaching would most destabilize the reef community graph. Prioritize these colonies for active restoration intervention — optimize restoration ROI with limited resources.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ff6b35">
+            <div class="tech-name">Larval Behavior Neural Network + Agent-Based Modeling <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Small neural networks (MLPs or LSTMs) trained on coral larval settlement behavior data: response to chemical cues, sound, light, and substrate rugosity. Integrated into agent-based models (ABMs) to simulate dispersal of millions of larvae under oceanographic conditions.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Predict optimal larval seeding locations for restoration — where will larvae settle naturally? Where should AUVs deploy micro-fragment plugs? Validate against eDNA surveys and physical settlement plates.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TIME-SERIES & FORECASTING -->
+    <div class="ai-category cat-prediction reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">📈</div>
+        <div class="cat-meta">
+          <div class="cat-name">Time-Series AI & Ecosystem Forecasting</div>
+          <div class="cat-sub">Temporal Fusion · Anomaly Detection · Bleaching Prediction · Population Dynamics</div>
+        </div>
+        <span class="cat-count">7 methods</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #ffd166">
+            <div class="tech-name">Temporal Fusion Transformer (TFT) <span class="tech-badge badge-arch">Arch</span></div>
+            <div class="tech-desc">Multi-horizon time-series forecasting model combining LSTM encoders, variable selection networks, static covariate encoders, and multi-head attention over temporal patterns. Produces quantile forecasts with interpretable variable importance scores showing which inputs drive each prediction.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Predict coral bleaching risk 4–8 weeks ahead from fused SST, pH, salinity, light availability, and historical bleaching records. Quantile outputs give probability distributions for risk-based restoration resource allocation.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ffd166">
+            <div class="tech-name">PatchTST / TimesNet <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">PatchTST treats time series as sequences of patches (like ViT for images) and uses self-attention to capture long-range dependencies. TimesNet transforms 1D time series into 2D space to leverage 2D convolution for multi-period temporal modeling.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Multi-sensor fusion forecasting — predict dissolved oxygen crashes in aquaculture pens, algae bloom onset from turbidity + nutrient trends, and fish aggregation patterns from temperature + current + lunar cycle inputs.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ffd166">
+            <div class="tech-name">LSTM Autoencoder for Anomaly Detection <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Train LSTM autoencoder to reconstruct normal sensor time series. Anomalies manifest as high reconstruction error. Threshold-based or learned density estimation (normalizing flows) determines anomaly scores without requiring labeled anomaly data.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Detect sensor fouling (biofouling on optical DO sensors causes drift), equipment failure, sudden chemical spills, or anomalous fish mortality events from multivariate sensor streams — triggering AUV investigation missions.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ffd166">
+            <div class="tech-name">N-BEATS / N-HiTS for Ecosystem Dynamics <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Pure deep learning forecasters without any recurrence. N-BEATS uses backward and forward residual connections with basis expansion. N-HiTS uses hierarchical interpolation for multi-scale decomposition of time series into trend, seasonal, and residual components.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Model population dynamics of herbivorous fish (urchins, parrotfish) that control algae-coral competition. Separate seasonal patterns (spawning cycles, monsoon effects) from long-term decline trends in reef health indices.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #ffd166">
+            <div class="tech-name">Gaussian Process Regression for Spatial Interpolation <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Bayesian nonparametric regression for spatial data. GP kernels encode domain knowledge: Matérn kernels for smooth oceanographic variables, periodic kernels for tidal patterns. Provides uncertainty-quantified predictions between sparse sensor locations.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Interpolate temperature, pH, and dissolved oxygen across an entire reef lagoon from 10–20 fixed sensor nodes. GP uncertainty maps guide AUV adaptive sampling — drone investigates high-uncertainty regions to reduce prediction error.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. REINFORCEMENT LEARNING -->
+    <div class="ai-category cat-rl reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">🤖</div>
+        <div class="cat-meta">
+          <div class="cat-name">Reinforcement Learning & Autonomous Decision-Making</div>
+          <div class="cat-sub">AUV Control · Mission Planning · Multi-Agent · Sim-to-Real Transfer</div>
+        </div>
+        <span class="cat-count">8 methods</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Proximal Policy Optimization (PPO) / Soft Actor-Critic (SAC) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">PPO is an on-policy actor-critic algorithm with clipped surrogate objective for stable policy gradient updates. SAC is an off-policy maximum entropy RL algorithm that simultaneously maximizes reward and action entropy, encouraging exploration and robust policies.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Train AUV hovering controllers that maintain station-keeping under currents, execute smooth survey transects, and perform dynamic obstacle avoidance around fragile coral. SAC's entropy bonus produces more robust behavior under environmental uncertainty.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Multi-Agent RL (MARL) — MAPPO / QMIX <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">MARL algorithms for coordinated AUV swarms. MAPPO extends PPO to cooperative multi-agent settings with centralized value functions and decentralized execution. QMIX uses monotonic mixing networks to factorize joint action-value functions for scalable coordination.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Coordinate 3–10 AUVs covering a reef system: divide survey area without overlap, cooperatively pursue and track a fish school, jointly triangulate acoustic sources. Emergent formation behaviors arise without explicit programming.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Model-Based RL / Dreamer V3 <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Dreamer learns a latent world model (recurrent state space model) from image observations, then plans and trains policy entirely within imagination. DreamerV3 introduces automatic hyperparameter scaling for robustness across domains without tuning.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Learn AUV control policies in simulation with 100x sample efficiency compared to model-free RL. The world model generalizes to novel reef geometries not seen in training, reducing costly real-world trial-and-error underwater.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Sim-to-Real Transfer + Domain Randomization <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Train policies in physics simulators (Gazebo, MuJoCo, Isaac Gym) with randomized domain parameters: water current strength/direction, visibility, lighting, sensor noise levels. Randomization creates policies robust to the sim-to-real gap without real-world data.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Train dexterous AUV manipulation (grasping coral plugs for transplantation, operating valves on aquaculture infrastructure) in simulation with randomized water turbulence before first real-ocean deployment.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Adaptive Sampling with Active Learning / Bayesian Optimization <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Active learning frameworks that select the most informative next observation to query. Bayesian Optimization uses GP surrogate models with acquisition functions (Expected Improvement, UCB) to efficiently optimize an expensive-to-evaluate objective.</div>
+            <div class="tech-why"><strong>Marine use:</strong> AUV intelligently decides where to swim next to maximize information gain about reef health — not following fixed transects but adaptively sampling anomalous zones. Reduces survey time by 40–60% for equivalent map quality.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #b5e48c">
+            <div class="tech-name">Large Language Model (LLM) for Mission Planning <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">LLMs (GPT-4, Claude) as high-level mission planners that translate natural language task descriptions from marine biologists into structured AUV mission primitives. Chain-of-thought reasoning decomposes complex ecological objectives into executable subtask sequences.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Marine biologist says "survey the northern bleached zone and take close-up samples from any staghorn coral with over 50% bleaching." LLM translates this into AUV mission JSON: navigate → detect staghorn → classify bleaching → approach → collect. No programming required.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. PHYSICS-INFORMED AI -->
+    <div class="ai-category cat-physics reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">⚛️</div>
+        <div class="cat-meta">
+          <div class="cat-name">Physics-Informed Neural Networks & Scientific ML</div>
+          <div class="cat-sub">Ocean Dynamics · Larval Dispersal · Fluid Simulation · PDE Solvers</div>
+        </div>
+        <span class="cat-count">6 methods</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #cdb4db">
+            <div class="tech-name">Physics-Informed Neural Networks (PINNs) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Neural networks that encode physical laws (PDEs like Navier-Stokes, advection-diffusion equations) as additional loss terms during training. The network simultaneously fits observational data and satisfies physical constraints, enabling accurate predictions from sparse measurements.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Model dissolved oxygen transport in aquaculture pens or larval dispersal in reef lagoons by encoding fluid dynamics equations directly into the neural network. Extrapolates physically plausible predictions to unobserved regions from sparse AUV measurements.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #cdb4db">
+            <div class="tech-name">Neural Operator (FNO / DeepONet) <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Fourier Neural Operator (FNO) learns mappings between function spaces in Fourier frequency domain — essentially a fast solver for families of PDEs. DeepONet learns operators using trunk and branch networks. Both generalize across different initial conditions without re-solving PDEs from scratch.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Rapidly solve ocean current PDEs on-demand for real-time larval dispersal forecasting or AUV current-optimal path planning — 1000x faster than traditional CFD solvers, enabling in-situ computation on buoy edge hardware.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #cdb4db">
+            <div class="tech-name">Graph Neural Networks for Ocean State Estimation <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">GNNs model oceanographic systems as irregular graphs where nodes are sensor locations and edges encode spatial/temporal relationships. Message passing aggregates information from neighboring nodes while respecting the unstructured geometry of real sensor deployments.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Estimate full 3D ocean state (temperature, salinity, currents) from a sparse network of AUV, buoy, and Argo float measurements — filling in gaps with physically consistent interpolations that traditional grid-based methods cannot achieve.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #cdb4db">
+            <div class="tech-name">Lagrangian Particle Tracking + Neural ODE <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Neural ODEs learn continuous-time dynamics of Lagrangian tracers (larval particles) in a learned vector field. ODE solver integrates learned dynamics forward in time for trajectory forecasting. Adjoint method enables efficient gradient computation through the ODE solve.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Predict where coral larvae released from spawning aggregations will settle after 10–30 days of drifting — identifying which reefs receive natural larvae and which are isolated, guiding AI-assisted AUV larval delivery missions.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. EDGE AI -->
+    <div class="ai-category cat-edge reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">⚡</div>
+        <div class="cat-meta">
+          <div class="cat-name">Edge AI, Model Compression & Onboard Inference</div>
+          <div class="cat-sub">Quantization · Pruning · Knowledge Distillation · Neural Architecture Search</div>
+        </div>
+        <span class="cat-count">7 techniques</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #f72585">
+            <div class="tech-name">TensorRT + INT8 / FP16 Quantization <span class="tech-badge badge-framework">Framework</span></div>
+            <div class="tech-desc">NVIDIA TensorRT optimizes trained models for inference: layer fusion, kernel auto-tuning, precision calibration. INT8 quantization reduces model precision from 32-bit float to 8-bit integer using a calibration dataset to minimize accuracy loss — achieving 4x throughput increase.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Run YOLOv9 + SegFormer simultaneously on Jetson Orin at 30 FPS within 10W power budget — critical for AUV battery life. INT8 YOLOv9 achieves 1% mAP loss vs FP32 while running 3x faster on Jetson GPU.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f72585">
+            <div class="tech-name">Knowledge Distillation <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Train a compact "student" model to mimic the output distribution (soft labels) of a large "teacher" model. Feature-based distillation also transfers intermediate layer representations. Produces small models that punch far above their parameter count in accuracy.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Distill a large cloud-trained coral classification model (ResNet-50 teacher) into a tiny student model (MobileNetV3) that runs at 120 FPS on a Coral Edge TPU in a benthic IoT sensor node consuming milliwatts.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f72585">
+            <div class="tech-name">Neural Architecture Search (NAS) — EfficientNet / Once-for-All <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Automated search for optimal model architectures given hardware constraints. Once-for-All trains a single super-network from which subnets of any size/latency can be extracted without retraining. Hardware-aware NAS explicitly optimizes for target device (Jetson, Coral TPU, FPGA).</div>
+            <div class="tech-why"><strong>Marine use:</strong> Automatically find the best model architecture for coral detection that maximizes mAP within the strict power/memory envelope of underwater embedded hardware — no human architecture engineering required.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f72585">
+            <div class="tech-name">Spiking Neural Networks (SNNs) <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Third-generation neural networks that process information as sparse temporal spike trains — mimicking biological neurons. SNNs on neuromorphic hardware (Intel Loihi 2) are event-driven: compute only when input changes, achieving 100x lower power consumption than GPU inference for suitable tasks.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Ultra-low-power continuous monitoring on battery-powered benthic IoT nodes. SNN processing of event camera or hydrophone data for always-on anomaly detection — "wake" the main CPU/GPU only when a significant event is detected.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f72585">
+            <div class="tech-name">Federated Learning (FL) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Distributed ML where models are trained locally on each device and only gradient updates (not raw data) are shared. Federated Averaging (FedAvg) aggregates updates from many AUVs/nodes into a global model. Differential privacy can be added to provide formal privacy guarantees.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Multiple AUV fleets from different research institutions collaboratively improve shared coral detection models without sharing proprietary raw imagery or location data of sensitive reef sites under conservation agreements.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. COMMUNICATIONS AI -->
+    <div class="ai-category cat-comms reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">📡</div>
+        <div class="cat-meta">
+          <div class="cat-name">AI for Underwater Communications & Data Compression</div>
+          <div class="cat-sub">Acoustic Channel AI · Neural Compression · Adaptive Protocols · Signal Processing</div>
+        </div>
+        <span class="cat-count">5 methods</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #4cc9f0">
+            <div class="tech-name">Deep Learning Acoustic Channel Equalization <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">LSTM or TCN-based models that learn to invert the time-varying underwater acoustic channel — compensating for multipath, Doppler spread, and ambient noise that corrupt acoustic modem signals. Outperforms traditional OFDM equalizers in rapidly varying shallow-water channels.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Improve acoustic modem reliability in shallow reef environments with heavy multipath from coral structure. Maintain communication link at 2–3x longer range than classical equalization, reducing mission abort rates from comms loss.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #4cc9f0">
+            <div class="tech-name">Neural Image / Video Compression (VQGAN / LIC) <span class="tech-badge badge-model">Model</span></div>
+            <div class="tech-desc">Learned image compression models (like those from Ballé et al.) that use nonlinear transforms and entropy coding learned jointly end-to-end. Outperform JPEG/H.265 significantly at low bit rates. Vector-quantized autoencoders (VQGAN) enable extreme compression with semantic preservation.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Transmit scientifically meaningful reef imagery over bandwidth-limited acoustic modems (2–10 kbps). Neural compression at 0.05 bpp preserves coral taxonomy-relevant features while reducing data size by 50x versus JPEG at equivalent quality.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #4cc9f0">
+            <div class="tech-name">AI-Prioritized Data Triage (Saliency-Guided Transmission) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">On-device AI classifier flags high-priority frames (rare species detected, anomalous bleaching pattern, equipment fault) for immediate transmission versus queuing routine frames for later batch upload. Combines object detection confidence scores with ecological novelty scoring.</div>
+            <div class="tech-why"><strong>Marine use:</strong> In a 4-hour AUV survey producing 500 GB of video, only ~100 MB of priority frames are transmitted in near-real-time through acoustic modem. Scientists receive actionable alerts within minutes instead of waiting for physical data recovery after the mission.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. MLOps & DIGITAL TWIN -->
+    <div class="ai-category cat-mlops reveal">
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-icon">☁️</div>
+        <div class="cat-meta">
+          <div class="cat-name">MLOps, Digital Twins & AI Infrastructure</div>
+          <div class="cat-sub">Continuous Learning · Active Annotation · Digital Twin AI · Deployment</div>
+        </div>
+        <span class="cat-count">6 frameworks</span>
+      </div>
+      <div class="cat-body">
+        <div class="tech-grid">
+
+          <div class="tech-item" style="--item-color: #f4a261">
+            <div class="tech-name">Continual Learning / Elastic Weight Consolidation (EWC) <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Continual learning algorithms that update models on new data without catastrophically forgetting previous knowledge. EWC adds a regularization penalty protecting important weights from previous tasks. Replay-based methods store a small subset of old data to interleave with new.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Reef ecosystems change — new bleaching events, invasive species, seasonal shifts. Deploy continual learning so coral detection models update from new AUV survey data without losing accuracy on previously learned species and sites.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f4a261">
+            <div class="tech-name">Active Learning + Human-in-the-Loop Annotation <span class="tech-badge badge-method">Method</span></div>
+            <div class="tech-desc">Active learning selects the most informative unlabeled samples for expert annotation using uncertainty sampling (high model entropy), core-set selection (maximum coverage), or query-by-committee (disagreement between ensemble models). Reduces annotation cost by 80–90%.</div>
+            <div class="tech-why"><strong>Marine use:</strong> AUV surveys generate terabytes of imagery. Active learning identifies the 1,000 frames most valuable for coral expert annotation from a dataset of 1,000,000 frames — massively reducing annotation cost while improving model performance.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f4a261">
+            <div class="tech-name">Reef Digital Twin AI (NeRF + Semantic State) <span class="tech-badge badge-emerging">Emerging</span></div>
+            <div class="tech-desc">Combines geometric 3D reconstruction (NeRF or 3DGS) with semantic AI layers (species maps, health indices, biomass estimates) into a living digital twin that is continuously updated by AUV surveys. Physics simulations run on the twin to predict future reef state under climate scenarios.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Visualize a 1:1 digital replica of the Great Barrier Reef section updated weekly by AUV data. Run bleaching scenarios ("what if SST rises 1°C for 6 weeks?") on the digital twin before it happens in reality. Guide preemptive interventions.</div>
+          </div>
+
+          <div class="tech-item" style="--item-color: #f4a261">
+            <div class="tech-name">MLflow / Weights & Biases / DVC for Experiment Tracking <span class="tech-badge badge-framework">Framework</span></div>
+            <div class="tech-desc">MLflow tracks parameters, metrics, and artifacts across thousands of model training runs. DVC (Data Version Control) versions large datasets with Git-like semantics. W&B provides real-time training visualization, model registry, and sweep-based hyperparameter optimization.</div>
+            <div class="tech-why"><strong>Marine use:</strong> Manage model training across multi-site reef datasets (GBR, Red Sea, Caribbean, Pacific), track which training data, augmentation strategy, and architecture produced each deployed model version — essential for reproducible marine science.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- UNDERWATER CHALLENGES x AI SOLUTIONS MATRIX -->
+  <div class="section reveal">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">Underwater <span class="accent">Challenges</span> × AI Solutions</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="matrix">
+      <table>
+        <thead>
+          <tr>
+            <th>Challenge</th>
+            <th>Why It's Hard</th>
+            <th>AI Solution</th>
+            <th>Specific Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Turbid Water</td>
+            <td>Scattering degrades visibility to <1m in coastal zones</td>
+            <td class="solution-highlight">GAN-based image enhancement, physics-informed dehazing</td>
+            <td>FUnIE-GAN, WaterNet, UIEC²-Net</td>
+          </tr>
+          <tr>
+            <td>Color Shift at Depth</td>
+            <td>Red light absorbed within 5m, blue-green dominates</td>
+            <td class="solution-highlight">Learned radiometric correction, spectral normalization</td>
+            <td>White Balance CNNs, UIE-WD</td>
+          </tr>
+          <tr>
+            <td>No GPS Underwater</td>
+            <td>EM waves cannot penetrate salt water beyond cm scale</td>
+            <td class="solution-highlight">Visual SLAM + DVL fusion, acoustic positioning AI</td>
+            <td>ORB-SLAM3, SuperGlue, EKF Nav</td>
+          </tr>
+          <tr>
+            <td>Species ID at Scale</td>
+            <td>1000+ fish species, 800+ coral species, fine-grained morphology</td>
+            <td class="solution-highlight">Vision foundation models, few-shot learning</td>
+            <td>BioCLIP, DINOv2, EfficientNetV2</td>
+          </tr>
+          <tr>
+            <td>Caustic Light Patterns</td>
+            <td>Rippling caustics from waves confuse texture classifiers</td>
+            <td class="solution-highlight">Deformable convolutions, data augmentation with synthetic caustics</td>
+            <td>DCN-based backbones, simulation augmentation</td>
+          </tr>
+          <tr>
+            <td>Acoustic Bandwidth</td>
+            <td>Only 2–10 kbps available for underwater transmission</td>
+            <td class="solution-highlight">Neural compression, AI-prioritized frame selection</td>
+            <td>VQGAN, Learned Image Compression, Triage AI</td>
+          </tr>
+          <tr>
+            <td>Battery Life (AUV)</td>
+            <td>4–8 hour missions, no recharge at depth</td>
+            <td class="solution-highlight">Adaptive sampling RL, model compression, neuromorphic AI</td>
+            <td>Bayesian Optimization, TensorRT, SNNs</td>
+          </tr>
+          <tr>
+            <td>Coral Bleaching Prediction</td>
+            <td>Climate-driven, weeks of lead time needed for intervention</td>
+            <td class="solution-highlight">Multi-modal time series forecasting + SST anomaly AI</td>
+            <td>TFT, PatchTST, GP Regression</td>
+          </tr>
+          <tr>
+            <td>Larval Dispersal</td>
+            <td>Chaotic ocean currents over 10–30 day settlement window</td>
+            <td class="solution-highlight">Physics-informed NNs, Neural ODEs, agent-based modeling</td>
+            <td>PINNs, FNO, Neural ODE</td>
+          </tr>
+          <tr>
+            <td>Multi-AUV Coordination</td>
+            <td>Acoustic comms latency, limited bandwidth for coordination</td>
+            <td class="solution-highlight">Decentralized multi-agent RL with local observations</td>
+            <td>MAPPO, QMIX, Dreamer-MARL</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KEY MODEL ZOO -->
+  <div class="section reveal">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Key <span class="accent">Model Zoo</span> Quick Reference</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="model-zoo">
+      <div class="model-card" style="--card-color: #00e5ff">
+        <div class="model-card-name">YOLOv9</div>
+        <div class="model-card-type">Object Detection</div>
+        <div class="model-card-desc">Real-time fish & coral detection. 30-60 FPS on Jetson Orin.</div>
+      </div>
+      <div class="model-card" style="--card-color: #00ff9d">
+        <div class="model-card-name">SAM 2</div>
+        <div class="model-card-type">Segmentation FM</div>
+        <div class="model-card-desc">Zero-shot segmentation of any reef organism from a single click.</div>
+      </div>
+      <div class="model-card" style="--card-color: #7b61ff">
+        <div class="model-card-name">SuperGlue</div>
+        <div class="model-card-type">Feature Matching</div>
+        <div class="model-card-desc">GNN-based robust matching for SLAM in turbid water.</div>
+      </div>
+      <div class="model-card" style="--card-color: #ff6b35">
+        <div class="model-card-name">BioCLIP</div>
+        <div class="model-card-type">Bio Foundation Model</div>
+        <div class="model-card-desc">Few-shot species ID across tree-of-life taxonomy.</div>
+      </div>
+      <div class="model-card" style="--card-color: #ffd166">
+        <div class="model-card-name">FUnIE-GAN</div>
+        <div class="model-card-type">Image Enhancement</div>
+        <div class="model-card-desc">Real-time underwater image restoration for turbid water.</div>
+      </div>
+      <div class="model-card" style="--card-color: #f72585">
+        <div class="model-card-name">DINOv2</div>
+        <div class="model-card-type">Vision Foundation</div>
+        <div class="model-card-desc">Universal visual features for few-shot coral classification.</div>
+      </div>
+      <div class="model-card" style="--card-color: #4cc9f0">
+        <div class="model-card-name">TFT</div>
+        <div class="model-card-type">Time-Series Forecast</div>
+        <div class="model-card-desc">Bleaching risk prediction with interpretable variable importance.</div>
+      </div>
+      <div class="model-card" style="--card-color: #b5e48c">
+        <div class="model-card-name">PPO / SAC</div>
+        <div class="model-card-type">Reinforcement Learning</div>
+        <div class="model-card-desc">AUV control under current disturbances and obstacles.</div>
+      </div>
+      <div class="model-card" style="--card-color: #cdb4db">
+        <div class="model-card-name">PINNs</div>
+        <div class="model-card-type">Physics-Informed NN</div>
+        <div class="model-card-desc">Larval dispersal modeling with Navier-Stokes constraints.</div>
+      </div>
+      <div class="model-card" style="--card-color: #f4a261">
+        <div class="model-card-name">FNO</div>
+        <div class="model-card-type">Neural Operator</div>
+        <div class="model-card-desc">1000x faster ocean PDE solving vs classical CFD solvers.</div>
+      </div>
+      <div class="model-card" style="--card-color: #00e5ff">
+        <div class="model-card-name">MAPPO</div>
+        <div class="model-card-type">Multi-Agent RL</div>
+        <div class="model-card-desc">Cooperative AUV swarm survey coordination.</div>
+      </div>
+      <div class="model-card" style="--card-color: #00ff9d">
+        <div class="model-card-name">DNABERT</div>
+        <div class="model-card-type">Genomic Transformer</div>
+        <div class="model-card-desc">eDNA species classification from water samples.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>AIoT Underwater Marine Robotics — Complete AI Technology Reference</div>
+    <div style="margin-top: 0.5rem; opacity: 0.5;">10 AI Domains · 60+ Models & Methods · Built for Reef Restoration & Ecosystem Intelligence</div>
+  </footer>
+
+</div>
+
+<script>
+  // Generate particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 35; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    p.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      animation-duration: ${Math.random() * 15 + 10}s;
+      animation-delay: ${Math.random() * 15}s;
+      opacity: 0;
+    `;
+    if (Math.random() > 0.7) {
+      p.style.background = '#00ff9d';
+    }
+    container.appendChild(p);
+  }
+
+  // Toggle accordion
+  function toggle(header) {
+    const cat = header.parentElement;
+    cat.classList.toggle('open');
+  }
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+
+  reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
